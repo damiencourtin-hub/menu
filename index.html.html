@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Choix du Menu</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #FAF7F2;
+    --warm-bg: #F5F0E8;
+    --gold: #C9A96E;
+    --dark: #2C2416;
+    --muted: #8A7A62;
+    --green: #4A7C59;
+    --green-light: #EBF3EE;
+    --border: #E2D9C8;
+    --card: #FFFFFF;
+    --shadow: rgba(44,36,22,0.08);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--warm-bg);
+    font-family: 'Lato', sans-serif;
+    color: var(--dark);
+    min-height: 100vh;
+    padding: 0 0 60px 0;
+  }
+
+  header {
+    background: var(--dark);
+    padding: 28px 20px 22px;
+    text-align: center;
+    border-bottom: 3px solid var(--gold);
+  }
+
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.7rem;
+    color: var(--cream);
+    letter-spacing: 0.04em;
+    margin-bottom: 4px;
+  }
+
+  header p {
+    color: var(--gold);
+    font-size: 0.82rem;
+    font-weight: 300;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .progress-bar {
+    background: var(--border);
+    height: 4px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--gold);
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  .container {
+    max-width: 540px;
+    margin: 0 auto;
+    padding: 0 16px;
+  }
+
+  .intro {
+    text-align: center;
+    padding: 24px 0 8px;
+  }
+  .intro p {
+    font-size: 0.9rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .intro strong {
+    color: var(--dark);
+  }
+
+  /* --- Person cards --- */
+  .person-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    margin: 12px 0;
+    overflow: hidden;
+    box-shadow: 0 2px 8px var(--shadow);
+    transition: box-shadow 0.2s;
+  }
+  .person-card.complete {
+    border-color: var(--green);
+    box-shadow: 0 2px 12px rgba(74,124,89,0.12);
+  }
+
+  .person-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px 10px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .person-number {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--warm-bg);
+    border: 1.5px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--muted);
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+  .person-card.complete .person-number {
+    background: var(--green);
+    border-color: var(--green);
+    color: white;
+  }
+  .person-name-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-family: 'Lato', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--dark);
+    letter-spacing: 0.02em;
+    outline: none;
+    cursor: text;
+  }
+  .person-name-input::placeholder {
+    color: var(--muted);
+    font-weight: 400;
+  }
+  .check-icon {
+    font-size: 1.1rem;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .person-card.complete .check-icon { opacity: 1; }
+
+  .person-body {
+    padding: 0 16px 14px;
+    border-top: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .menu-section {
+    grid-column: span 1;
+  }
+  .menu-section.full { grid-column: span 2; }
+
+  .section-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--gold);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .section-label::before {
+    content: '';
+    display: inline-block;
+    width: 14px;
+    height: 1px;
+    background: var(--gold);
+  }
+
+  .choice-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .choice-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    border-radius: 8px;
+    border: 1.5px solid var(--border);
+    background: var(--cream);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: 'Lato', sans-serif;
+    font-size: 0.8rem;
+    color: var(--dark);
+    text-align: left;
+    line-height: 1.3;
+    width: 100%;
+  }
+  .choice-btn:hover {
+    border-color: var(--gold);
+    background: #FDF8F0;
+  }
+  .choice-btn.selected {
+    border-color: var(--green);
+    background: var(--green-light);
+    color: var(--green);
+    font-weight: 700;
+  }
+  .choice-btn .dot {
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+  .choice-btn.selected .dot {
+    background: var(--green);
+    border-color: var(--green);
+  }
+
+  .supp-tag {
+    font-size: 0.68rem;
+    color: var(--muted);
+    background: #F0EAE0;
+    border-radius: 4px;
+    padding: 1px 5px;
+    margin-left: auto;
+    white-space: nowrap;
+    font-style: italic;
+  }
+  .choice-btn.selected .supp-tag {
+    background: rgba(74,124,89,0.12);
+    color: var(--green);
+  }
+
+  .formula-toggle {
+    grid-column: span 2;
+    display: flex;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .formula-btn {
+    flex: 1;
+    padding: 8px 6px;
+    border-radius: 8px;
+    border: 1.5px solid var(--border);
+    background: var(--cream);
+    cursor: pointer;
+    font-family: 'Lato', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--muted);
+    text-align: center;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transition: all 0.15s;
+  }
+  .formula-btn.active {
+    background: var(--dark);
+    border-color: var(--dark);
+    color: var(--gold);
+  }
+
+  /* Summary */
+  .summary-section {
+    margin-top: 28px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px var(--shadow);
+  }
+  .summary-header {
+    background: var(--dark);
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .summary-header h2 {
+    font-family: 'Playfair Display', serif;
+    color: var(--cream);
+    font-size: 1rem;
+  }
+  .summary-header span {
+    color: var(--gold);
+    font-size: 0.8rem;
+  }
+  .summary-body { padding: 16px 18px; }
+
+  .summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.78rem;
+  }
+  .summary-table th {
+    text-align: left;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-size: 0.65rem;
+    padding: 4px 6px 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .summary-table td {
+    padding: 6px 6px;
+    border-bottom: 1px solid var(--warm-bg);
+    vertical-align: top;
+    color: var(--dark);
+  }
+  .summary-table tr:last-child td { border-bottom: none; }
+  .summary-table .name-col { font-weight: 700; }
+  .summary-table .formula-badge {
+    display: inline-block;
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: var(--warm-bg);
+    color: var(--muted);
+  }
+
+  .copy-btn {
+    display: block;
+    width: 100%;
+    margin-top: 14px;
+    padding: 12px;
+    background: var(--green);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Lato', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .copy-btn:hover { background: #3d6b4b; }
+  .copy-btn:active { transform: scale(0.98); }
+
+  .counters {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+  .counter-chip {
+    background: var(--warm-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+  .counter-chip strong {
+    display: block;
+    font-size: 1rem;
+    color: var(--dark);
+    font-family: 'Playfair Display', serif;
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: var(--dark);
+    color: var(--gold);
+    padding: 10px 22px;
+    border-radius: 30px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 999;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Choix du Menu</h1>
+  <p>Sélection pour le repas d'équipe</p>
+</header>
+<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+<div class="container">
+  <div class="intro" style="padding-top:20px">
+    <p>Choisissez votre formule, puis sélectionnez votre <strong>entrée</strong> et/ou <strong>dessert</strong> selon la formule choisie.</p>
+  </div>
+
+  <div id="cards"></div>
+
+  <div class="summary-section" id="summarySection">
+    <div class="summary-header">
+      <h2>Récapitulatif</h2>
+      <span id="completedCount">0 / 23</span>
+    </div>
+    <div class="summary-body">
+      <table class="summary-table" id="summaryTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Collaborateur</th>
+            <th>Formule</th>
+            <th>Entrée / Dessert</th>
+            <th>Plat</th>
+          </tr>
+        </thead>
+        <tbody id="summaryBody"></tbody>
+      </table>
+      <div class="counters" id="counters"></div>
+      <button class="copy-btn" onclick="copyForWhatsApp()">📋 Copier pour WhatsApp</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">✓ Copié dans le presse-papiers</div>
+
+<script>
+const ENTREES = [
+  { id: 'oe', label: 'Œuf mayo' },
+  { id: 'sf', label: 'Salade tomate fêta' },
+  { id: 'tc', label: 'Terrine de campagne' },
+  { id: 'rs', label: 'Rillettes de saumon' },
+];
+const PLATS = [
+  { id: 'hb', label: 'Hampe de bœuf sauce poivre' },
+  { id: 'sc', label: 'Salade caesar' },
+  { id: 'li', label: 'Linguines sauce tomate & burrata' },
+  { id: 'ps', label: 'Pavé de saumon haricots verts', supp: '+2€' },
+];
+const DESSERTS = [
+  { id: 'ti', label: 'Tiramisu' },
+  { id: 'mc', label: 'Mousse au chocolat' },
+  { id: 'fb', label: 'Fromage blanc coulis fruits rouges' },
+  { id: 'cf', label: 'Cappuccino de fraises' },
+];
+
+const NAMES = [
+  "Paris Général Leclerc",
+  "Créteil Soleil 2",
+  "Le Mans Marchande",
+  "Bourges Commerce",
+  "Paris Gobelins",
+  "Poitiers Gambetta",
+  "Thiais Belle Épine",
+  "Brétigny sur Orge",
+  "Orléans Bourgogne",
+  "Tours Nationale",
+  "Ormesson",
+  "Paris Rue de Rennes",
+  "Ville du Bois",
+  "Paris Commerce",
+  "Paris Vaugirard",
+  "Paris Italie 2",
+  "Villiers en Bière Carrefour",
+  "SRZ Studio",
+  "GL Beaugrenelle 2",
+  "Orléans Saran",
+  "Ikram Tahali",
+  "Damien Courtin",
+];
+
+const state = NAMES.map(name => ({
+  name,
+  formula: null,
+  entree: null,
+  plat: null,
+  dessert: null,
+}));
+
+function isComplete(s) {
+  if (!s.formula || !s.plat) return false;
+  if (s.formula === 'ep' && !s.entree) return false;
+  if (s.formula === 'pd' && !s.dessert) return false;
+  return true;
+}
+
+function renderCards() {
+  const container = document.getElementById('cards');
+  container.innerHTML = '';
+  state.forEach((s, i) => {
+    const div = document.createElement('div');
+    div.className = 'person-card' + (isComplete(s) ? ' complete' : '');
+    div.id = `card-${i}`;
+
+    div.innerHTML = `
+      <div class="person-header">
+        <div class="person-number">${i + 1}</div>
+        <span class="person-name-input">${s.name}</span>
+        <span class="check-icon">✅</span>
+      </div>
+
+      <div class="person-body">
+        <!-- Formula -->
+        <div class="formula-toggle">
+          <button class="formula-btn ${s.formula === 'ep' ? 'active' : ''}" onclick="setFormula(${i},'ep')">
+            Entrée + Plat
+          </button>
+          <button class="formula-btn ${s.formula === 'pd' ? 'active' : ''}" onclick="setFormula(${i},'pd')">
+            Plat + Dessert
+          </button>
+        </div>
+
+        <!-- Entrée -->
+        <div class="menu-section ${s.formula === 'pd' ? '' : ''}" style="${s.formula === 'pd' ? 'opacity:0.3;pointer-events:none' : ''}">
+          <div class="section-label">Entrée</div>
+          <div class="choice-group">
+            ${ENTREES.map(e => `
+              <button class="choice-btn ${s.entree === e.id ? 'selected' : ''}"
+                onclick="pick(${i},'entree','${e.id}')">
+                <span class="dot"></span>${e.label}
+              </button>`).join('')}
+          </div>
+        </div>
+
+        <!-- Plat -->
+        <div class="menu-section">
+          <div class="section-label">Plat</div>
+          <div class="choice-group">
+            ${PLATS.map(p => `
+              <button class="choice-btn ${s.plat === p.id ? 'selected' : ''}"
+                onclick="pick(${i},'plat','${p.id}')">
+                <span class="dot"></span>${p.label}
+                ${p.supp ? `<span class="supp-tag">${p.supp}</span>` : ''}
+              </button>`).join('')}
+          </div>
+        </div>
+
+        <!-- Dessert -->
+        <div class="menu-section full" style="${s.formula === 'ep' ? 'opacity:0.3;pointer-events:none' : ''}">
+          <div class="section-label">Dessert</div>
+          <div class="choice-group" style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
+            ${DESSERTS.map(d => `
+              <button class="choice-btn ${s.dessert === d.id ? 'selected' : ''}"
+                onclick="pick(${i},'dessert','${d.id}')">
+                <span class="dot"></span>${d.label}
+              </button>`).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function setFormula(i, f) {
+  state[i].formula = f;
+  if (f === 'ep') { state[i].dessert = null; }
+  if (f === 'pd') { state[i].entree = null; }
+  refreshCard(i);
+  updateSummary();
+}
+
+function pick(i, field, val) {
+  state[i][field] = val;
+  refreshCard(i);
+  updateSummary();
+}
+
+function refreshCard(i) {
+  const s = state[i];
+  const card = document.getElementById(`card-${i}`);
+  if (!card) return;
+  // Re-render just this card
+  const nameVal = card.querySelector('.person-name-input').value;
+  state[i].name = nameVal;
+  renderCards();
+}
+
+function updateSummary() {
+  const completed = state.filter(isComplete).length;
+  document.getElementById('completedCount').textContent = `${completed} / 23`;
+  
+  // Progress
+  document.getElementById('progressFill').style.width = `${(completed / 23) * 100}%`;
+
+  const tbody = document.getElementById('summaryBody');
+  tbody.innerHTML = '';
+
+  const counts = { entrees: {}, plats: {}, desserts: {} };
+
+  state.forEach((s, i) => {
+    if (!s.plat && !s.formula) return;
+    const tr = document.createElement('tr');
+    const nomE = s.entree ? ENTREES.find(e => e.id === s.entree)?.label : '—';
+    const nomP = s.plat ? PLATS.find(p => p.id === s.plat)?.label : '—';
+    const nomD = s.dessert ? DESSERTS.find(d => d.id === s.dessert)?.label : '—';
+    const formLabel = s.formula === 'ep' ? 'E+P' : s.formula === 'pd' ? 'P+D' : '—';
+
+    if (s.entree) counts.entrees[nomE] = (counts.entrees[nomE] || 0) + 1;
+    if (s.plat) counts.plats[nomP] = (counts.plats[nomP] || 0) + 1;
+    if (s.dessert) counts.desserts[nomD] = (counts.desserts[nomD] || 0) + 1;
+
+    tr.innerHTML = `
+      <td>${i + 1}</td>
+      <td class="name-col">${s.name || `Collab. ${i+1}`}</td>
+      <td><span class="formula-badge">${formLabel}</span></td>
+      <td style="font-size:0.75rem">${s.formula === 'ep' ? nomE : nomD}</td>
+      <td style="font-size:0.75rem">${nomP}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  // Counters
+  const countersEl = document.getElementById('counters');
+  const allCounts = [
+    { label: 'Entrées', data: counts.entrees },
+    { label: 'Plats', data: counts.plats },
+    { label: 'Desserts', data: counts.desserts },
+  ];
+  let html = '';
+  allCounts.forEach(cat => {
+    Object.entries(cat.data).forEach(([name, n]) => {
+      html += `<div class="counter-chip"><strong>${n}</strong>${name}</div>`;
+    });
+  });
+  countersEl.innerHTML = html;
+}
+
+function copyForWhatsApp() {
+  let text = '🍽️ *CHOIX DES MENUS*\n\n';
+  state.forEach((s, i) => {
+    const nom = s.name || `Collaborateur ${i + 1}`;
+    const nomE = s.entree ? ENTREES.find(e => e.id === s.entree)?.label : null;
+    const nomP = s.plat ? PLATS.find(p => p.id === s.plat)?.label : '—';
+    const nomD = s.dessert ? DESSERTS.find(d => d.id === s.dessert)?.label : null;
+    const formule = s.formula === 'ep' ? 'Entrée + Plat' : s.formula === 'pd' ? 'Plat + Dessert' : '—';
+    text += `*${i + 1}. ${nom}* — ${formule}\n`;
+    if (nomE) text += `   🥗 ${nomE}\n`;
+    text += `   🍽️ ${nomP}\n`;
+    if (nomD) text += `   🍮 ${nomD}\n`;
+    text += '\n';
+  });
+
+  // Totals
+  const counts = {};
+  [...ENTREES, ...PLATS, ...DESSERTS].forEach(item => {
+    const total = state.filter(s =>
+      s.entree === item.id || s.plat === item.id || s.dessert === item.id
+    ).length;
+    if (total > 0) counts[item.label] = total;
+  });
+
+  text += '---\n📊 *TOTAUX*\n';
+  Object.entries(counts).forEach(([name, n]) => {
+    text += `• ${name} : ${n}\n`;
+  });
+
+  navigator.clipboard.writeText(text).then(() => {
+    const t = document.getElementById('toast');
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2200);
+  });
+}
+
+renderCards();
+updateSummary();
+</script>
+</body>
+</html>
