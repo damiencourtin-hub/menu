@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Carte du jour</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Quicksand:wght@500;600&display=swap');
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #FDE7EF 0%, #E6F0FA 50%, #E8F5E9 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .card {
+    background: #FFFFFF;
+    border-radius: 28px;
+    padding: 32px 28px;
+    max-width: 380px;
+    width: 100%;
+    box-shadow: 0 12px 30px rgba(180, 180, 220, 0.25);
+    text-align: center;
+  }
+
+  .date {
+    font-size: 14px;
+    color: #A9A2C7;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .title {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: #6B5B95;
+    margin: 0 0 20px;
+  }
+
+  .badge {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 5px 14px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+  }
+
+  .icon {
+    font-size: 46px;
+    margin: 6px 0 12px;
+  }
+
+  .exercise {
+    font-size: 17px;
+    color: #5A5A6E;
+    font-weight: 500;
+    margin-bottom: 18px;
+    line-height: 1.5;
+  }
+
+  .motivation {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 16px;
+    color: #6B5B95;
+    font-weight: 500;
+    font-style: italic;
+    padding: 14px;
+    background: #F6F3FB;
+    border-radius: 16px;
+    margin-bottom: 14px;
+    line-height: 1.5;
+  }
+
+  .pensee-box {
+    background: #FFF6F0;
+    border-radius: 16px;
+    padding: 14px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .pensee-icon { font-size: 18px; }
+
+  .pensee-label {
+    font-size: 11px;
+    color: #C9A6A6;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 3px;
+  }
+
+  .pensee-text {
+    font-size: 14px;
+    color: #8A7575;
+    line-height: 1.6;
+  }
+
+  .actions {
+    margin-top: 22px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+  }
+
+  button {
+    font-family: 'Poppins', sans-serif;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 18px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: transform 0.1s ease, opacity 0.2s ease;
+  }
+
+  button:active { transform: scale(0.96); }
+
+  .nav-btn {
+    background: #F0EEF7;
+    color: #A9A2C7;
+    width: 40px;
+  }
+
+  .done-btn {
+    background: #D8EFE0;
+    color: #5A9B7A;
+    flex: 1;
+    font-weight: 500;
+  }
+
+  .done-btn.is-done {
+    background: #A8DDC0;
+    color: #3E7A5C;
+  }
+
+  .outside-note {
+    font-size: 12px;
+    color: #C9BEE0;
+    margin-top: 16px;
+  }
+
+  .progress-wrap {
+    margin-top: 18px;
+  }
+
+  .progress-label {
+    font-size: 12px;
+    color: #A9A2C7;
+    margin-bottom: 6px;
+  }
+
+  .progress-bar {
+    width: 100%;
+    height: 10px;
+    background: #F0EEF7;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: #A8DDC0;
+    border-radius: 10px;
+    transition: width 0.3s ease;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="date" id="date-label">Astuce</div>
+    <h1 class="title" id="title-label">Ouvre-moi dans Safari 🌷</h1>
+    <span class="badge" id="badge" style="display:none;"></span>
+    <div class="icon" id="icon">🌷</div>
+    <div class="exercise" id="exercise">Pour afficher la carte du jour, ouvre ce fichier dans Safari (ou un autre navigateur) plutôt qu'en aperçu rapide.</div>
+    <div class="motivation" id="motivation" style="display:none;"></div>
+    <div class="pensee-box" id="pensee-box" style="display:none;">
+      <span class="pensee-icon">💛</span>
+      <div>
+        <div class="pensee-label">Pensée du jour</div>
+        <div class="pensee-text" id="pensee"></div>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="nav-btn" id="prev-btn">‹</button>
+      <button class="done-btn" id="done-btn">Marquer comme fait</button>
+      <button class="nav-btn" id="next-btn">›</button>
+    </div>
+    <div class="outside-note" id="outside-note"></div>
+    <div class="progress-wrap">
+      <div class="progress-label" id="progress-label"></div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+    </div>
+  </div>
+
+<script>
+const exercices = [
+  {t:"10 min de marche rapide en musique", cat:"cardio", icon:"🚶"},
+  {t:"15 squats + 15 fentes (en douceur)", cat:"force", icon:"💪"},
+  {t:"20 min de vélo, vrai ou appartement", cat:"cardio", icon:"🚴"},
+  {t:"5 min d'étirements doux au réveil", cat:"souplesse", icon:"🧘"},
+  {t:"10 min de yoga, salutations au soleil", cat:"souplesse", icon:"🧘"},
+  {t:"30 min de marche avec une amie", cat:"plaisir", icon:"👯"},
+  {t:"Gainage : 3 fois 30 secondes", cat:"force", icon:"🔥"},
+  {t:"15 min de natation ou aquagym", cat:"cardio", icon:"🏊"},
+  {t:"Danse libre sur 3 musiques préférées", cat:"plaisir", icon:"💃"},
+  {t:"20 min de course ou marche rapide", cat:"cardio", icon:"🏃"},
+  {t:"5 min de mobilité épaules, hanches, chevilles", cat:"souplesse", icon:"🤸"},
+  {t:"5 min de montée d'escaliers", cat:"force", icon:"🏗️"},
+  {t:"15 min de pilates débutant (vidéo)", cat:"force", icon:"🤍"},
+  {t:"30 min de balade en forêt ou au parc", cat:"plaisir", icon:"🌳"},
+  {t:"10 min de renforcement abdos en douceur", cat:"force", icon:"💪"},
+  {t:"30 min de vélo en famille", cat:"plaisir", icon:"🚲"},
+  {t:"Étirements complets avant le coucher", cat:"souplesse", icon:"🌙"},
+  {t:"Marche active pendant un appel téléphonique", cat:"cardio", icon:"📱"},
+  {t:"10 min de corde à sauter ou jumping jacks", cat:"cardio", icon:"⏱️"},
+  {t:"10 min de yoga pour le dos", cat:"souplesse", icon:"🧘"},
+  {t:"1h de randonnée tranquille", cat:"plaisir", icon:"🥾"},
+  {t:"15 min de circuit poids du corps", cat:"force", icon:"🔥"},
+  {t:"Stretching des jambes après la douche", cat:"souplesse", icon:"🦵"},
+  {t:"Aquagym ou natation détente", cat:"plaisir", icon:"🏊"},
+  {t:"Marche rapide jusqu'au marché", cat:"cardio", icon:"🧺"},
+  {t:"5 min d'étirements et respiration profonde", cat:"souplesse", icon:"🌬️"},
+  {t:"10 min de renforcement fessiers", cat:"force", icon:"💪"},
+  {t:"Vélo balade découverte", cat:"plaisir", icon:"🚲"},
+  {t:"10 min de yoga doux et méditation", cat:"souplesse", icon:"🧘"},
+  {t:"20 min de running débutant", cat:"cardio", icon:"🏃"},
+  {t:"Journée détente : marche + étirements", cat:"plaisir", icon:"🌿"}
+];
+
+const motivations = [
+  "Chaque petit pas compte, tu avances !",
+  "Tu es plus forte que ta fatigue.",
+  "Pas besoin d'être parfaite, juste régulière.",
+  "Ton corps te dit merci d'avance.",
+  "10 minutes valent toujours mieux que 0.",
+  "Fais-le pour toi, juste pour toi.",
+  "Bouger, c'est s'offrir un cadeau.",
+  "Aujourd'hui, sois fière de toi.",
+  "Le mouvement, c'est la liberté.",
+  "Tu n'as rien à prouver, juste à essayer.",
+  "Respire, bouge, recommence demain.",
+  "Petit effort, grande victoire.",
+  "Tu mérites ce moment pour toi.",
+  "La motivation vient en bougeant, pas avant.",
+  "Une version de toi te remerciera ce soir.",
+  "Avance à ton rythme, sans pression.",
+  "Le sport, c'est aussi du plaisir.",
+  "Tu as déjà fait le plus dur : commencer.",
+  "Sois douce avec toi-même, et régulière.",
+  "Chaque séance est une preuve d'amour pour toi.",
+  "Le corps adore le mouvement, offre-lui ça.",
+  "Une pause active vaut mille excuses.",
+  "Tu construis ta force, jour après jour.",
+  "Le meilleur moment pour bouger, c'est maintenant.",
+  "Tu es capable de bien plus que tu crois.",
+  "Un jour à la fois, ça suffit.",
+  "Ton énergie du jour commence par ce geste.",
+  "Bouger un peu vaut mieux que culpabiliser beaucoup.",
+  "Tu fais ça pour ton bien-être, point final.",
+  "La régularité bat l'intensité.",
+  "Aujourd'hui est un nouveau départ.",
+  "Ton corps est ton allié, pas ton ennemi.",
+  "Savoure le moment, pas la performance.",
+  "Le sport, c'est du temps offert à toi.",
+  "Tu progresses même quand tu ne le vois pas.",
+  "Une petite victoire aujourd'hui, une grande confiance demain.",
+  "Tu es sur la bonne voie, continue !"
+];
+
+const pensees = [
+  "Un verre d'eau pétillante, un bon livre, et la soirée est déjà belle.",
+  "Chaque jour sans alcool est un cadeau que tu te fais.",
+  "Ton sommeil et ton énergie te disent merci.",
+  "Tu n'es pas seule, et chaque jour compte.",
+  "Remplace l'envie par un thé, une marche ou une grande respiration.",
+  "Tu es en train de réécrire tes habitudes, et c'est énorme.",
+  "La fierté que tu ressens vaut plus qu'un verre.",
+  "Un jour à la fois, sans pression.",
+  "Ton corps récupère, ta tête s'éclaircit un peu plus chaque jour.",
+  "Célèbre chaque petite victoire, même invisible aux yeux des autres.",
+  "Tu choisis ta version la plus forte, aujourd'hui encore.",
+  "Pas de jugement, juste de la douceur envers toi-même.",
+  "Chaque non que tu dis te rapproche de ce que tu veux.",
+  "Ton énergie d'aujourd'hui vient de tes choix d'hier, continue.",
+  "Tu es plus libre que tu ne le penses.",
+  "Un petit pas, une grande différence sur la durée.",
+  "Offre-toi un plaisir sans alcool : musique, bain chaud, balade.",
+  "Tu avances, même les jours qui semblent plus difficiles.",
+  "Sois fière du chemin déjà parcouru, il compte.",
+  "Ton mieux d'aujourd'hui est suffisant, vraiment.",
+  "Tu mérites de te sentir bien, pleinement et durablement.",
+  "Chaque jour clair est un jour gagné pour toi.",
+  "Tu construis une nouvelle routine, doucement et sûrement.",
+  "Le sport t'aide aussi à apaiser l'envie, profite-en.",
+  "Tu as le contrôle, pas l'inverse.",
+  "Respire, ça passe, et tu seras fière après.",
+  "Une habitude à la fois, tu y es presque.",
+  "Ton futur toi te dit déjà merci pour aujourd'hui.",
+  "Continue, tu fais quelque chose d'important pour toi."
+];
+
+const catInfo = {
+  cardio:    { label: "Cardio",      bg: "#FDE2D4", fg: "#C97B5A" },
+  force:     { label: "Force douce", bg: "#FFF3C9", fg: "#C9A227" },
+  souplesse: { label: "Souplesse",   bg: "#DCEBFA", fg: "#5E92BF" },
+  plaisir:   { label: "Plaisir",     bg: "#E1F3E3", fg: "#6FAE7C" }
+};
+
+const days = [];
+for (let i = 0; i < 61; i++) {
+  const ex = exercices[i % exercices.length];
+  const mot = motivations[i % motivations.length];
+  const pensee = pensees[i % pensees.length];
+  let label, num, month;
+  if (i < 30) { num = i + 1; month = 6; label = num + " juin"; }
+  else { num = i - 29; month = 7; label = num + " juillet"; }
+  days.push({ i, num, month, label, ex, mot, pensee });
+}
+
+function getTodayIndex() {
+  const today = new Date();
+  const m = today.getMonth() + 1;
+  const d = today.getDate();
+  if (m === 6 && d >= 1 && d <= 30) return d - 1;
+  if (m === 7 && d >= 1 && d <= 31) return 29 + d;
+  return null;
+}
+
+const todayIndex = getTodayIndex();
+let current = todayIndex !== null ? todayIndex : 0;
+
+const elDate = document.getElementById("date-label");
+const elTitle = document.getElementById("title-label");
+const elBadge = document.getElementById("badge");
+const elIcon = document.getElementById("icon");
+const elExercise = document.getElementById("exercise");
+const elMotivation = document.getElementById("motivation");
+const elPensee = document.getElementById("pensee");
+const elPenseeBox = document.getElementById("pensee-box");
+const elDoneBtn = document.getElementById("done-btn");
+const elOutsideNote = document.getElementById("outside-note");
+const elProgressLabel = document.getElementById("progress-label");
+const elProgressFill = document.getElementById("progress-fill");
+
+function render() {
+  const d = days[current];
+  const c = catInfo[d.ex.cat];
+
+  elDate.textContent = (current === todayIndex) ? "Aujourd'hui" : d.label;
+  elTitle.textContent = (current === todayIndex) ? "Carte du jour" : d.label;
+  elBadge.textContent = c.label;
+  elBadge.style.background = c.bg;
+  elBadge.style.color = c.fg;
+  elBadge.style.display = "inline-block";
+  elIcon.textContent = d.ex.icon;
+  elExercise.textContent = d.ex.t;
+  elMotivation.textContent = d.mot;
+  elMotivation.style.display = "block";
+  elPensee.textContent = d.pensee;
+  elPenseeBox.style.display = "flex";
+
+  const key = "carte-jour-fait-" + d.i;
+  let isDone = false;
+  try { isDone = localStorage.getItem(key) === "1"; } catch (e) {}
+  elDoneBtn.textContent = isDone ? "Fait, bravo !" : "Marquer comme fait";
+  elDoneBtn.classList.toggle("is-done", isDone);
+
+  if (todayIndex === null) {
+    elOutsideNote.textContent = "Hors période juin-juillet : voici une carte à découvrir";
+  } else {
+    elOutsideNote.textContent = "";
+  }
+
+  let total = 0;
+  try {
+    for (let j = 0; j < days.length; j++) {
+      if (localStorage.getItem("carte-jour-fait-" + j) === "1") total++;
+    }
+  } catch (e) {}
+  const pct = Math.round((total / days.length) * 100);
+  elProgressLabel.textContent = total + " / " + days.length + " jours réussis";
+  elProgressFill.style.width = pct + "%";
+}
+
+elDoneBtn.addEventListener("click", () => {
+  const key = "carte-jour-fait-" + days[current].i;
+  try {
+    const isDone = localStorage.getItem(key) === "1";
+    if (isDone) localStorage.removeItem(key);
+    else localStorage.setItem(key, "1");
+  } catch (e) {}
+  render();
+});
+
+document.getElementById("prev-btn").addEventListener("click", () => {
+  current = (current - 1 + days.length) % days.length;
+  render();
+});
+
+document.getElementById("next-btn").addEventListener("click", () => {
+  current = (current + 1) % days.length;
+  render();
+});
+
+render();
+</script>
+</body>
+</html>
